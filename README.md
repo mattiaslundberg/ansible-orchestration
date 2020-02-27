@@ -9,4 +9,5 @@
  4. Install python dependencies: `pipenv install`
  5. Run `terraform apply`
  6. Run `ansible playbook install.yaml`
- 6. Run `ansible playbook --extra-vars version=latest --extra-vars tg_name=<terraform output tg-name> deploy.yaml`
+ 7. Run `ansible playbook --extra-vars version=1.5 --extra-vars tg_name=<terraform output tg-name> deploy.yaml`
+ 8. Open lb-dns (terraform output) in browser!
