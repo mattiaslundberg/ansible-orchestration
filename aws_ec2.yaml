@@ -1,0 +1,7 @@
+plugin: aws_ec2
+regions:
+  - eu-north-1
+  - eu-central-1
+filters:
+  tag:Service: Hello
+aws_profile: codelabs

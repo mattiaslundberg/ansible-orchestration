@@ -1,0 +1,44 @@
+---
+- name: Deploy to one server at the time
+  hosts: all
+  serial: 1
+  become: no
+
+  tasks:
+    - name: Remove from load balancer
+      delegate_to: localhost
+      elb_target:
+        profile: ansible-orchestration
+        region: "eu-north-1"
+        target_group_name: "{{ tg_name }}"
+        target_id: "{{ hostvars[inventory_hostname]['instance_id'] }}"
+        target_port: 8080
+        target_status: unused
+        target_status_timeout: 180
+        state: absent
+
+    - name: Remove old docker container
+      docker_container:
+        name: app
+        state: absent
+
+    - name: Start new docker container
+      docker_container:
+        name: app
+        pull: yes
+        restart_policy: unless-stopped
+        image: "markbenschop/flask-demo:{{ version }}"
+        ports:
+          - 8080:5000
+
+    - name: Add to load balancer
+      delegate_to: localhost
+      elb_target:
+        profile: ansible-orchestration
+        region: "eu-north-1"
+        target_group_name: "{{ tg_name }}"
+        target_id: "{{ hostvars[inventory_hostname]['instance_id'] }}"
+        target_port: 8080
+        target_status: healthy
+        target_status_timeout: 180
+        state: present
